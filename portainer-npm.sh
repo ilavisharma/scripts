@@ -30,7 +30,7 @@ networks:
 EOF
 echo "[INFO] Created docker-compose.yml for Nginx Proxy Manager."
 
-docker-compose up -d
+docker compose up -d
 echo "[INFO] Started Nginx Proxy Manager containers."
 
 # Create default network if not exists
@@ -47,7 +47,6 @@ echo "[INFO] Created and navigated to portainer directory."
 
 # Create the docker-compose.yml file for Portainer
 cat <<EOF > docker-compose.yml
-version: '3.8'
 services:
   portainer:
     image: 'portainer/portainer-ce:latest'
@@ -69,7 +68,7 @@ networks:
 EOF
 echo "[INFO] Created docker-compose.yml for Portainer."
 
-docker-compose up -d
+docker compose up -d
 echo "[INFO] Started Portainer containers."
 
 # Final confirmation
