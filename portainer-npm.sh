@@ -1,11 +1,5 @@
 #!/bin/bash
 
-# Check for Docker installation
-if ! command -v docker &>/dev/null; then
-    echo "[ERROR] Docker is not installed. Please install Docker first."
-    exit 1
-fi
-
 # Set up base directory for Docker
 cd /home || exit
 echo "[INFO] Navigating to /home directory."
