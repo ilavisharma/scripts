@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Check for Docker installation
+if ! command -v docker &>/dev/null; then
+    echo "[ERROR] Docker is not installed. Please install Docker first."
+    exit 1
+fi
+
 # Set up base directory for Docker
 cd /home || exit
 echo "[INFO] Navigating to /home directory."
@@ -13,7 +19,6 @@ echo "[INFO] Created and navigated to nginxproxymanager directory."
 
 # Create the docker-compose.yml file for Nginx Proxy Manager
 cat <<EOF > docker-compose.yml
-version: '3.8'
 services:
   app:
     image: 'jc21/nginx-proxy-manager:latest'
@@ -31,22 +36,14 @@ networks:
 EOF
 echo "[INFO] Created docker-compose.yml for Nginx Proxy Manager."
 
-docker compose up -d
+docker-compose up -d
 echo "[INFO] Started Nginx Proxy Manager containers."
 
-# Get the Docker network name for Nginx Proxy Manager
-echo "[INFO] Retrieving Docker network name for Nginx Proxy Manager."
-grep_network_name() {
-  docker network list | awk '/nginxproxy/ {print $2}'
-}
-
-NGINX_NETWORK=$(grep_network_name)
-if [ -z "$NGINX_NETWORK" ]; then
-  echo "[ERROR] Could not find the Nginx Proxy Manager network."
-  exit 1
+# Create default network if not exists
+if ! docker network ls | grep -q nginxproxy_default; then
+    docker network create nginxproxy_default
+    echo "[INFO] Created external network: nginxproxy_default."
 fi
-
-echo "[INFO] Nginx Proxy Manager network detected: $NGINX_NETWORK"
 
 # Install Portainer
 echo "[INFO] Setting up Portainer."
@@ -70,7 +67,7 @@ services:
       - './data:/data'
     networks:
       default:
-        name: $NGINX_NETWORK
+        name: nginxproxy_default
 
 networks:
   default:
@@ -78,7 +75,7 @@ networks:
 EOF
 echo "[INFO] Created docker-compose.yml for Portainer."
 
-docker compose up -d
+docker-compose up -d
 echo "[INFO] Started Portainer containers."
 
 # Final confirmation
